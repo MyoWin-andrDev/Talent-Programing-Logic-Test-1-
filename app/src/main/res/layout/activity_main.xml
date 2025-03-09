@@ -1,0 +1,376 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/main"
+    android:background="@color/blue"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+    <TextView
+        android:id="@+id/tvHeader"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:text="Logic Test 1"
+        android:textSize="24sp"
+        android:textColor="@color/grey"
+        android:textStyle="bold"
+        android:layout_marginTop="24dp"/>
+
+    <TextView
+        android:id="@+id/tvTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvHeader"
+        android:text="Calculator"
+        android:textSize="20sp"
+        android:textColor="@color/grey"
+        android:layout_marginTop="16dp"/>
+
+    <TextView
+        android:id="@+id/tvOperation"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/tvTitle"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:text=""
+        android:textColor="@color/darkGrey"
+        android:textStyle="bold"
+        android:textSize="26sp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginTop="40dp"/>
+
+    <TextView
+        android:id="@+id/tvOperator"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvOperation"
+        android:text=""
+        android:textSize="30sp"
+        android:textStyle="bold"
+        android:textColor="@color/white"
+        android:layout_marginEnd="16dp"
+        android:layout_marginTop="16dp"/>
+
+
+    <TextView
+        android:id="@+id/etCalculate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:text=""
+        app:layout_constraintTop_toBottomOf="@id/tvOperator"
+        android:textSize="30sp"
+        android:textColor="@color/white"
+        android:textStyle="bold"
+        android:textAlignment="gravity"
+        android:layout_marginEnd="16dp"
+        android:layout_marginTop="16dp"/>
+
+    <GridLayout
+        android:id="@+id/glKeypad"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:background="@drawable/bg_keypad"
+        app:layout_constraintTop_toBottomOf="@id/etCalculate"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="40dp"
+        android:rowCount="5"
+        android:columnCount="4">
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btClear"
+            android:onClick="onClearClicked"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_rowWeight="1"
+            android:layout_columnWeight="1"
+            android:layout_margin="10dp"
+            android:background="@drawable/bt_char_bg"
+            android:text="C"
+            android:fontFamily="@font/roboto_black"
+            android:textColor="@color/blue"
+            android:textSize="30dp"
+            android:textStyle="bold"/>
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_rowWeight="1"
+            android:layout_columnWeight="1"
+            android:layout_margin="10dp"
+            android:background="@drawable/bt_char_bg"
+            android:text="."
+            android:fontFamily="@font/roboto_black"
+            android:textColor="@color/blue"
+            android:textSize="30dp"
+            android:textStyle="bold"/>
+
+        <androidx.appcompat.widget.AppCompatImageButton
+            android:onClick="onBackSpaceClicked"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_rowWeight="1"
+            android:layout_columnWeight="1"
+            android:layout_margin="10dp"
+            android:background="@drawable/bt_char_bg"
+            android:src="@drawable/ic_backspace"
+            android:fontFamily="@font/roboto_black"
+            android:textColor="@color/blue"
+            android:textSize="30dp"
+            android:textStyle="bold"/>
+
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:onClick="onOperatorClicked"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_rowWeight="1"
+            android:layout_columnWeight="1"
+            android:layout_margin="10dp"
+            android:background="@drawable/bt_operator_bg"
+            android:text="÷"
+            android:fontFamily="@font/roboto_black"
+            android:textColor="@color/white"
+            android:textSize="30dp"
+            android:textStyle="bold"/>
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:onClick="onNumberClicked"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_rowWeight="1"
+            android:layout_columnWeight="1"
+            android:layout_margin="10dp"
+            android:background="@drawable/bt_num_bg"
+            android:text="7"
+            android:fontFamily="@font/roboto_black"
+            android:textColor="@color/blue"
+            android:textSize="30dp"
+            android:textStyle="bold"/>
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:onClick="onNumberClicked"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_rowWeight="1"
+            android:layout_columnWeight="1"
+            android:layout_margin="10dp"
+            android:background="@drawable/bt_num_bg"
+            android:text="8"
+            android:fontFamily="@font/roboto_black"
+            android:textColor="@color/blue"
+            android:textSize="30dp"
+            android:textStyle="bold"/>
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:onClick="onNumberClicked"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_rowWeight="1"
+            android:layout_columnWeight="1"
+            android:layout_margin="10dp"
+            android:background="@drawable/bt_num_bg"
+            android:text="9"
+            android:fontFamily="@font/roboto_black"
+            android:textColor="@color/blue"
+            android:textSize="30dp"
+            android:textStyle="bold"/>
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:onClick="onOperatorClicked"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_rowWeight="1"
+            android:layout_columnWeight="1"
+            android:layout_margin="10dp"
+            android:background="@drawable/bt_operator_bg"
+            android:text="×"
+            android:fontFamily="@font/roboto_black"
+            android:textColor="@color/white"
+            android:textSize="30dp"
+            android:textStyle="bold"/>
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:onClick="onNumberClicked"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_rowWeight="1"
+            android:layout_columnWeight="1"
+            android:layout_margin="10dp"
+            android:background="@drawable/bt_num_bg"
+            android:text="4"
+            android:fontFamily="@font/roboto_black"
+            android:textColor="@color/blue"
+            android:textSize="30dp"
+            android:textStyle="bold"/>
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:onClick="onNumberClicked"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_rowWeight="1"
+            android:layout_columnWeight="1"
+            android:layout_margin="10dp"
+            android:background="@drawable/bt_num_bg"
+            android:text="5"
+            android:fontFamily="@font/roboto_black"
+            android:textColor="@color/blue"
+            android:textSize="30dp"
+            android:textStyle="bold"/>
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:onClick="onNumberClicked"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_rowWeight="1"
+            android:layout_columnWeight="1"
+            android:layout_margin="10dp"
+            android:background="@drawable/bt_num_bg"
+            android:text="6"
+            android:fontFamily="@font/roboto_black"
+            android:textColor="@color/blue"
+            android:textSize="30dp"
+            android:textStyle="bold"/>
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:onClick="onOperatorClicked"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_rowWeight="1"
+            android:layout_columnWeight="1"
+            android:layout_margin="10dp"
+            android:background="@drawable/bt_operator_bg"
+            android:text="-"
+            android:fontFamily="@font/roboto_black"
+            android:textColor="@color/white"
+            android:textSize="30dp"
+            android:textStyle="bold"/>
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:onClick="onNumberClicked"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_rowWeight="1"
+            android:layout_columnWeight="1"
+            android:layout_margin="10dp"
+            android:background="@drawable/bt_num_bg"
+            android:text="1"
+            android:fontFamily="@font/roboto_black"
+            android:textColor="@color/blue"
+            android:textSize="30dp"
+            android:textStyle="bold"/>
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:onClick="onNumberClicked"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_rowWeight="1"
+            android:layout_columnWeight="1"
+            android:layout_margin="10dp"
+            android:background="@drawable/bt_num_bg"
+            android:text="2"
+            android:fontFamily="@font/roboto_black"
+            android:textColor="@color/blue"
+            android:textSize="30dp"
+            android:textStyle="bold"/>
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:onClick="onNumberClicked"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_rowWeight="1"
+            android:layout_columnWeight="1"
+            android:layout_margin="10dp"
+            android:background="@drawable/bt_num_bg"
+            android:text="3"
+            android:fontFamily="@font/roboto_black"
+            android:textColor="@color/blue"
+            android:textSize="30dp"
+            android:textStyle="bold"/>
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:onClick="onOperatorClicked"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_rowWeight="1"
+            android:layout_columnWeight="1"
+            android:layout_margin="10dp"
+            android:background="@drawable/bt_operator_bg"
+            android:text="+"
+            android:fontFamily="@font/roboto_black"
+            android:textColor="@color/white"
+            android:textSize="30dp"
+            android:textStyle="bold"/>
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:onClick="onNumberClicked"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_rowWeight="1"
+            android:layout_columnWeight="1"
+            android:layout_margin="10dp"
+            android:background="@drawable/bt_num_bg"
+            android:text="00"
+            android:fontFamily="@font/roboto_black"
+            android:textColor="@color/blue"
+            android:textSize="30dp"
+            android:textStyle="bold"/>
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:onClick="onNumberClicked"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_rowWeight="1"
+            android:layout_columnWeight="1"
+            android:layout_margin="10dp"
+            android:background="@drawable/bt_num_bg"
+            android:text="0"
+            android:fontFamily="@font/roboto_black"
+            android:textColor="@color/blue"
+            android:textSize="30dp"
+            android:textStyle="bold"/>
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:onClick="onOperatorClicked"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_rowWeight="1"
+            android:layout_columnWeight="1"
+            android:layout_margin="10dp"
+            android:background="@drawable/bt_num_bg"
+            android:text="%"
+            android:fontFamily="@font/roboto_black"
+            android:textColor="@color/blue"
+            android:textSize="30dp"
+            android:textStyle="bold"/>
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:onClick="onEqualClicked"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_rowWeight="1"
+            android:layout_columnWeight="1"
+            android:layout_margin="10dp"
+            android:background="@drawable/bt_equal_bg"
+            android:text="="
+            android:fontFamily="@font/roboto_black"
+            android:textColor="@color/blue"
+            android:textSize="30dp"
+            android:textStyle="bold"/>
+
+    </GridLayout>
+
+
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
