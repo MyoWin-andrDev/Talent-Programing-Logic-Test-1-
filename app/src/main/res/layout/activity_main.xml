@@ -103,6 +103,7 @@
             android:textStyle="bold"/>
 
         <androidx.appcompat.widget.AppCompatButton
+            android:onClick="onDecimalClicked"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_rowWeight="1"
@@ -341,7 +342,7 @@
             android:textStyle="bold"/>
 
         <androidx.appcompat.widget.AppCompatButton
-            android:onClick="onOperatorClicked"
+            android:onClick="onPercentageClicked"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_rowWeight="1"
