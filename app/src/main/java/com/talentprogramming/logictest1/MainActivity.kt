@@ -20,7 +20,6 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
     }
 
     fun onNumberClicked(view: View) {
@@ -54,6 +53,7 @@ class MainActivity : AppCompatActivity() {
         Log.d("latest Operator", lastOperator.toString())
         val secondValueText = binding.etCalculate.text.toString()
         lastOperator = binding.tvOperator.text.toString()
+        Log.d("latest Operator After", lastOperator.toString())
         if (secondValueText == "") {
             Toast.makeText(this@MainActivity, "Please enter a second number", Toast.LENGTH_SHORT)
                 .show()
@@ -113,7 +113,7 @@ class MainActivity : AppCompatActivity() {
             val etNewValue = etValue.substring(0, etValue.length - 1)
             binding.etCalculate.text = etNewValue
         }
-        else if(lastOperator == "=") {
+        else if(lastOperator == "=" || result != null) {
             clearCalculation()
         }
         else{
