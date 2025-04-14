@@ -2,20 +2,21 @@ package com.talentprogramming.logictest1
 
 import android.annotation.SuppressLint
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.talentprogramming.logictest1.databinding.ActivityMainBinding
+import java.math.BigDecimal
+import java.math.RoundingMode
 
-@Suppress("CAST_NEVER_SUCCEEDS", "IMPLICIT_CAST_TO_ANY")
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
-    private var firstValueText : String = ""
-    private var result : Number? = null
-    private var lastOperator: String? = null
-    private var operator : String? = null
+    private var firstOperand: BigDecimal? = null
+    private var currentOperator: String? = null
+    private var isNewCalculation = true
+    private var calculationComplete = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -23,115 +24,182 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun onNumberClicked(view: View) {
-        if(lastOperator == "="){
-            clearCalculation()
+        if (calculationComplete) {
+            resetCalculator()
         }
-        val btnNumber = view as Button
-        val etCalculate = binding.etCalculate.text.toString()
-        if(etCalculate == "0" || etCalculate == "00"){
-            binding.etCalculate.text = "0"
+
+        val button = view as Button
+        val number = button.text.toString()
+        val currentText = binding.etCalculate.text.toString()
+
+        if (isNewCalculation) {
+            binding.etCalculate.text = number
+            isNewCalculation = false
+        } else {
+            if (currentText == "0") {
+                binding.etCalculate.text = number
+            } else {
+                binding.etCalculate.append(number)
+            }
         }
-        else{
-            binding.etCalculate.append(btnNumber.text.toString())
-        }
+
+        calculationComplete = false
     }
+
     fun onOperatorClicked(view: View) {
-        val btnOperator = view as Button
-        operator = btnOperator.text.toString()
-        firstValueText = binding.etCalculate.text.toString()
-        if(firstValueText == ""){
-            Toast.makeText(this@MainActivity, "Enter a number first", Toast.LENGTH_SHORT).show()
+        if (calculationComplete) {
+            calculationComplete = false
         }
-        else{
-            binding.tvOperation.text = firstValueText
+
+        val button = view as Button
+        val operator = button.text.toString()
+        val currentText = binding.etCalculate.text.toString()
+
+        if (currentText.isEmpty()) {
+            Toast.makeText(this, "Enter a number first", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        try {
+            firstOperand = currentText.toBigDecimal()
+            currentOperator = operator
+            binding.tvOperation.text = currentText
             binding.tvOperator.text = operator
             binding.etCalculate.text = ""
+            isNewCalculation = true
+        } catch (e: NumberFormatException) {
+            showError("Invalid number format")
         }
     }
+
     @SuppressLint("SetTextI18n")
-    fun onEqualClicked(view : View) {
-        Log.d("latest Operator", lastOperator.toString())
-        val secondValueText = binding.etCalculate.text.toString()
-        lastOperator = binding.tvOperator.text.toString()
-        Log.d("latest Operator After", lastOperator.toString())
-        if (secondValueText == "") {
-            Toast.makeText(this@MainActivity, "Please enter a second number", Toast.LENGTH_SHORT)
-                .show()
+    fun onEqualClicked(view: View) {
+        if (calculationComplete) {
+            return
         }
-        else if(firstValueText == "" && secondValueText == ""){
-            Toast.makeText(this@MainActivity, "Please enter a number first", Toast.LENGTH_SHORT)
-                .show()
+
+        val secondOperandText = binding.etCalculate.text.toString()
+
+        if (secondOperandText.isEmpty()) {
+            Toast.makeText(this, "Enter a second number", Toast.LENGTH_SHORT).show()
+            return
         }
-        else if(lastOperator != "="  && binding.etCalculate.text.toString() != result.toString()){
-            try{
-                val firstValue = firstValueText.toDouble()
-                val secondValue = secondValueText.toDouble()
-                result = when (operator) {
-                    "+" -> firstValue + secondValue
-                    "-" -> firstValue - secondValue
-                    "×" -> firstValue * secondValue
-                    "÷" -> ((if(secondValue != 0.0 ){
-                        firstValue / secondValue
-                    } else{
-                        Toast.makeText(this@MainActivity, "Cannot divided by 0", Toast.LENGTH_LONG).show()
-                    }) as Number)
-                    else -> {
-                        Toast.makeText(this@MainActivity, "Calculation Error", Toast.LENGTH_SHORT)
-                            .show() as Number
-                    }
+
+        if (firstOperand == null || currentOperator == null) {
+            Toast.makeText(this, "Start a calculation first", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        try {
+            val secondOperand = secondOperandText.toBigDecimal()
+            val result = calculate(firstOperand!!, secondOperand, currentOperator!!)
+
+            binding.tvOperation.text = "${formatOperand(firstOperand!!)} $currentOperator ${formatOperand(secondOperand)}"
+            binding.etCalculate.text = formatResult(result)
+            binding.tvOperator.text = "="
+
+            calculationComplete = true
+            isNewCalculation = true
+        } catch (e: ArithmeticException) {
+            showError(e.message ?: "Calculation error")
+        } catch (e: NumberFormatException) {
+            showError("Invalid number format")
+        }
+    }
+
+    private fun calculate(first: BigDecimal, second: BigDecimal, operator: String): BigDecimal {
+        return when (operator) {
+            "+" -> first.add(second)
+            "-" -> first.subtract(second)
+            "×" -> first.multiply(second)
+            "÷" -> {
+                if (second.compareTo(BigDecimal.ZERO) == 0) {
+                    throw ArithmeticException("Cannot divide by zero")
                 }
-                binding.tvOperation.text = "$firstValueText $operator $secondValueText"
-                binding.etCalculate.text = (if(result!!.toDouble() % 1.0 == 0.0)  result!!.toInt() else result).toString()
-                binding.tvOperator.text = "="
+                first.divide(second, 10, RoundingMode.HALF_UP)
             }
-            catch (e : Exception){
-                Log.d("Error", e.message.toString())
-            }
+            else -> throw ArithmeticException("Unknown operator")
         }
-
     }
+
+    private fun formatResult(result: BigDecimal): String {
+        // Remove trailing zeros and convert to plain string
+        val stripped = result.stripTrailingZeros()
+        return stripped.toPlainString()
+    }
+
+    private fun formatOperand(operand: BigDecimal): String {
+        // Format operands to show decimals only when needed
+        return if (operand.scale() <= 0) {
+            operand.toLong().toString()
+        } else {
+            operand.stripTrailingZeros().toPlainString()
+        }
+    }
+
     fun onClearClicked(view: View) {
-        firstValueText = ""
-        binding.etCalculate.text = ""
-        binding.tvOperation.text = ""
-        binding.tvOperator.text = ""
-        result = null
+        resetCalculator()
     }
-    private fun clearCalculation(){
-        Log.d("Latest Operation", lastOperator.toString())
-        firstValueText = ""
-        binding.etCalculate.text = ""
-        binding.tvOperation.text = ""
-        binding.tvOperator.text = ""
-        result = null
-        lastOperator = null
 
-    }
     fun onBackSpaceClicked(view: View) {
-        val etValue = binding.etCalculate.text.toString()
-        if(etValue != ""){
-            val etNewValue = etValue.substring(0, etValue.length - 1)
-            binding.etCalculate.text = etNewValue
-        }
-        else if(lastOperator == "=" || result != null) {
-            clearCalculation()
-        }
-        else{
-            binding.etCalculate.text = "0"
+        if (calculationComplete) {
+            return
         }
 
+        val currentText = binding.etCalculate.text.toString()
+        if (currentText.isNotEmpty()) {
+            binding.etCalculate.text = currentText.dropLast(1)
+            if (binding.etCalculate.text.isEmpty()) {
+                binding.etCalculate.text = "0"
+                isNewCalculation = true
+            }
+        }
     }
 
-    fun onPercentageClicked(view: View) {}
     fun onDecimalClicked(view: View) {
-        val currentValue = binding.etCalculate.text.toString()
-        if(!currentValue.contains(".")){
-            if(currentValue.isEmpty()){
-                binding.etCalculate.text = "0."
-            }
-            else{
-                binding.etCalculate.append(".")
+        if (calculationComplete) {
+            resetCalculator()
+        }
+
+        val currentText = binding.etCalculate.text.toString()
+        if (isNewCalculation) {
+            binding.etCalculate.text = "0."
+            isNewCalculation = false
+        } else if (!currentText.contains(".")) {
+            binding.etCalculate.append(".")
+        }
+    }
+
+    fun onPercentageClicked(view: View) {
+        if (calculationComplete) {
+            resetCalculator()
+        }
+
+        val currentText = binding.etCalculate.text.toString()
+        if (currentText.isNotEmpty()) {
+            try {
+                val value = currentText.toBigDecimal()
+                val percentage = value.divide(BigDecimal(100))
+                binding.etCalculate.text = formatResult(percentage)
+                isNewCalculation = true
+            } catch (e: NumberFormatException) {
+                showError("Invalid number format")
             }
         }
+    }
+
+    private fun resetCalculator() {
+        firstOperand = null
+        currentOperator = null
+        binding.etCalculate.text = ""
+        binding.tvOperation.text = ""
+        binding.tvOperator.text = ""
+        isNewCalculation = true
+        calculationComplete = false
+    }
+
+    private fun showError(message: String) {
+        Toast.makeText(this, message, Toast.LENGTH_LONG).show()
+        resetCalculator()
     }
 }
