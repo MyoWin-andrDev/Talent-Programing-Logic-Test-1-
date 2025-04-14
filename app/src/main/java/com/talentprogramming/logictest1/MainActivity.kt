@@ -36,7 +36,7 @@ class MainActivity : AppCompatActivity() {
             binding.etCalculate.text = number
             isNewCalculation = false
         } else {
-            if (currentText == "0") {
+            if (currentText == "0" || currentText == "00") {
                 binding.etCalculate.text = number
             } else {
                 binding.etCalculate.append(number)
