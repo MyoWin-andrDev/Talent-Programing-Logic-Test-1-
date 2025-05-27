@@ -27,7 +27,6 @@ class MainActivity : AppCompatActivity() {
         if (calculationComplete) {
             resetCalculator()
         }
-
         val button = view as Button
         val number = button.text.toString()
         val currentText = binding.etCalculate.text.toString()
@@ -50,7 +49,6 @@ class MainActivity : AppCompatActivity() {
         if (calculationComplete) {
             calculationComplete = false
         }
-
         val button = view as Button
         val operator = button.text.toString()
         val currentText = binding.etCalculate.text.toString()
@@ -77,7 +75,6 @@ class MainActivity : AppCompatActivity() {
         if (calculationComplete) {
             return
         }
-
         val secondOperandText = binding.etCalculate.text.toString()
 
         if (secondOperandText.isEmpty()) {
@@ -107,6 +104,29 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    fun onPercentageClicked(view: View) {
+        // Treat percentage just like any other operator
+        val button = view as Button
+        val operator = button.text.toString()
+        val currentText = binding.etCalculate.text.toString()
+
+        if (currentText.isEmpty()) {
+            Toast.makeText(this, "Enter a number first", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        try {
+            firstOperand = currentText.toBigDecimal()
+            currentOperator = operator
+            binding.tvOperation.text = currentText
+            binding.tvOperator.text = operator
+            binding.etCalculate.text = ""
+            isNewCalculation = true
+        } catch (e: NumberFormatException) {
+            showError("Invalid number format")
+        }
+    }
+
     private fun calculate(first: BigDecimal, second: BigDecimal, operator: String): BigDecimal {
         return when (operator) {
             "+" -> first.add(second)
@@ -118,18 +138,16 @@ class MainActivity : AppCompatActivity() {
                 }
                 first.divide(second, 10, RoundingMode.HALF_UP)
             }
+            "%" -> first.multiply(second).divide(BigDecimal(100))
             else -> throw ArithmeticException("Unknown operator")
         }
     }
 
     private fun formatResult(result: BigDecimal): String {
-        // Remove trailing zeros and convert to plain string
-        val stripped = result.stripTrailingZeros()
-        return stripped.toPlainString()
+        return result.stripTrailingZeros().toPlainString()
     }
 
     private fun formatOperand(operand: BigDecimal): String {
-        // Format operands to show decimals only when needed
         return if (operand.scale() <= 0) {
             operand.toLong().toString()
         } else {
@@ -167,24 +185,6 @@ class MainActivity : AppCompatActivity() {
             isNewCalculation = false
         } else if (!currentText.contains(".")) {
             binding.etCalculate.append(".")
-        }
-    }
-
-    fun onPercentageClicked(view: View) {
-        if (calculationComplete) {
-            resetCalculator()
-        }
-
-        val currentText = binding.etCalculate.text.toString()
-        if (currentText.isNotEmpty()) {
-            try {
-                val value = currentText.toBigDecimal()
-                val percentage = value.divide(BigDecimal(100))
-                binding.etCalculate.text = formatResult(percentage)
-                isNewCalculation = true
-            } catch (e: NumberFormatException) {
-                showError("Invalid number format")
-            }
         }
     }
 
