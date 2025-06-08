@@ -11,6 +11,7 @@ import java.math.BigDecimal
 import java.math.RoundingMode
 
 class MainActivity : AppCompatActivity() {
+
     private lateinit var binding: ActivityMainBinding
     private var firstOperand: BigDecimal? = null
     private var currentOperator: String? = null
@@ -24,39 +25,28 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun onNumberClicked(view: View) {
-        if (calculationComplete) {
-            resetCalculator()
-        }
+        if (calculationComplete) resetCalculator()
 
-        val button = view as Button
-        val number = button.text.toString()
+        val number = (view as Button).text.toString()
         val currentText = binding.etCalculate.text.toString()
 
-        if (isNewCalculation) {
-            binding.etCalculate.text = number
-            isNewCalculation = false
-        } else {
-            if (currentText == "0" || currentText == "00") {
-                binding.etCalculate.text = number
-            } else {
-                binding.etCalculate.append(number)
-            }
+        binding.etCalculate.text = when {
+            isNewCalculation || currentText == "0" || currentText == "00" -> number
+            else -> currentText + number
         }
 
+        isNewCalculation = false
         calculationComplete = false
     }
 
     fun onOperatorClicked(view: View) {
-        if (calculationComplete) {
-            calculationComplete = false
-        }
+        if (calculationComplete) calculationComplete = false
 
-        val button = view as Button
-        val operator = button.text.toString()
+        val operator = (view as Button).text.toString()
         val currentText = binding.etCalculate.text.toString()
 
         if (currentText.isEmpty()) {
-            Toast.makeText(this, "Enter a number first", Toast.LENGTH_SHORT).show()
+            showToast("Enter a number first")
             return
         }
 
@@ -74,19 +64,17 @@ class MainActivity : AppCompatActivity() {
 
     @SuppressLint("SetTextI18n")
     fun onEqualClicked(view: View) {
-        if (calculationComplete) {
-            return
-        }
+        if (calculationComplete) return
 
         val secondOperandText = binding.etCalculate.text.toString()
 
         if (secondOperandText.isEmpty()) {
-            Toast.makeText(this, "Enter a second number", Toast.LENGTH_SHORT).show()
+            showToast("Enter a second number")
             return
         }
 
         if (firstOperand == null || currentOperator == null) {
-            Toast.makeText(this, "Start a calculation first", Toast.LENGTH_SHORT).show()
+            showToast("Start a calculation first")
             return
         }
 
@@ -100,66 +88,29 @@ class MainActivity : AppCompatActivity() {
 
             calculationComplete = true
             isNewCalculation = true
-        } catch (e: ArithmeticException) {
+        } catch (e: Exception) {
             showError(e.message ?: "Calculation error")
-        } catch (e: NumberFormatException) {
-            showError("Invalid number format")
         }
     }
 
-    private fun calculate(first: BigDecimal, second: BigDecimal, operator: String): BigDecimal {
-        return when (operator) {
-            "+" -> first.add(second)
-            "-" -> first.subtract(second)
-            "×" -> first.multiply(second)
-            "÷" -> {
-                if (second.compareTo(BigDecimal.ZERO) == 0) {
-                    throw ArithmeticException("Cannot divide by zero")
-                }
-                first.divide(second, 10, RoundingMode.HALF_UP)
-            }
-            else -> throw ArithmeticException("Unknown operator")
-        }
-    }
-
-    private fun formatResult(result: BigDecimal): String {
-        // Remove trailing zeros and convert to plain string
-        val stripped = result.stripTrailingZeros()
-        return stripped.toPlainString()
-    }
-
-    private fun formatOperand(operand: BigDecimal): String {
-        // Format operands to show decimals only when needed
-        return if (operand.scale() <= 0) {
-            operand.toLong().toString()
-        } else {
-            operand.stripTrailingZeros().toPlainString()
-        }
-    }
-
-    fun onClearClicked(view: View) {
-        resetCalculator()
-    }
+    fun onClearClicked(view: View) = resetCalculator()
 
     fun onBackSpaceClicked(view: View) {
-        if (calculationComplete) {
-            return
-        }
+        if (calculationComplete) return
 
         val currentText = binding.etCalculate.text.toString()
-        if (currentText.isNotEmpty()) {
-            binding.etCalculate.text = currentText.dropLast(1)
-            if (binding.etCalculate.text.isEmpty()) {
-                binding.etCalculate.text = "0"
-                isNewCalculation = true
-            }
+        val updatedText = currentText.dropLast(1)
+
+        binding.etCalculate.text = if (updatedText.isEmpty()) {
+            isNewCalculation = true
+            "0"
+        } else {
+            updatedText
         }
     }
 
     fun onDecimalClicked(view: View) {
-        if (calculationComplete) {
-            resetCalculator()
-        }
+        if (calculationComplete) resetCalculator()
 
         val currentText = binding.etCalculate.text.toString()
         if (isNewCalculation) {
@@ -171,9 +122,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun onPercentageClicked(view: View) {
-        if (calculationComplete) {
-            resetCalculator()
-        }
+        if (calculationComplete) resetCalculator()
 
         val currentText = binding.etCalculate.text.toString()
         if (currentText.isNotEmpty()) {
@@ -188,6 +137,30 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    // ------------------------
+    // Helper methods
+    // ------------------------
+
+    private fun calculate(first: BigDecimal, second: BigDecimal, operator: String): BigDecimal {
+        return when (operator) {
+            "+" -> first + second
+            "-" -> first - second
+            "×" -> first * second
+            "÷" -> {
+                if (second == BigDecimal.ZERO) throw ArithmeticException("Cannot divide by zero")
+                first.divide(second, 10, RoundingMode.HALF_UP)
+            }
+            else -> throw ArithmeticException("Unknown operator")
+        }
+    }
+
+    private fun formatResult(result: BigDecimal): String =
+        result.stripTrailingZeros().toPlainString()
+
+    private fun formatOperand(operand: BigDecimal): String =
+        if (operand.scale() <= 0) operand.toLong().toString()
+        else operand.stripTrailingZeros().toPlainString()
+
     private fun resetCalculator() {
         firstOperand = null
         currentOperator = null
@@ -199,7 +172,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun showError(message: String) {
-        Toast.makeText(this, message, Toast.LENGTH_LONG).show()
+        showToast(message)
         resetCalculator()
+    }
+
+    private fun showToast(message: String) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
 }
